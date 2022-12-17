@@ -1,6 +1,6 @@
 namespace Discovery.Domain;
 
-public enum RobotCommand
+public enum Command
 {
     Advance,
     Left,

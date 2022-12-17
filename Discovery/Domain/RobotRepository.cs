@@ -8,13 +8,18 @@ public class RobotRepository
     {
         return Robots.FirstOrDefault(r => r.Id == id);
     }
+    
+    public Robot[] GetAll()
+    {
+        return Robots.ToArray();
+    }
 
     public Robot Add(Robot robot)
     {
         var maxRobotId = Robots.Any() ? Robots.Max(r => r.Id) : 0;
-        var newRobot = robot with {Id = maxRobotId + 1};
-        Robots.Add(newRobot);
-        return newRobot;
+        robot.SetId(maxRobotId + 1);
+        Robots.Add(robot);
+        return robot;
     }
 
     public Robot Update(Robot robot)

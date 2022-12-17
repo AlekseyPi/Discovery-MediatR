@@ -9,44 +9,25 @@ public class RobotsService
         _robotRepository = robotRepository;
     }
 
-    public Robot Execute(int robotId, RobotCommand command)
+    public Robot Add(Robot robot)
     {
-        var robot = _robotRepository.Get(robotId) ?? throw new Exception($"Robot with id {robotId} not found");
-        var position = robot.Position;
-        switch (command)
+        return _robotRepository.Add(robot);
+    }
+
+    public Robot[] Execute(Command[] commands)
+    {
+        var robots = _robotRepository.GetAll();
+
+        foreach (var robot in robots)
         {
-            case RobotCommand.Advance:
-                switch (position.DirectionAngle)
-                {
-                    case 0:
-                        position = position with {Y = position.Y + 1};
-                        break;
-                    case 90:
-                        position = position with {X = position.X + 1};
-                        break;
-                    case 180:
-                        position = position with {Y = position.Y - 1};
-                        break;
-                    case 270:
-                        position = position with {Y = position.X - 1};
-                        break;
-                    default:
-                        throw new InvalidOperationException($"Invalid robot angle {position.DirectionAngle}");
-                };
-                break;
-                
-            case RobotCommand.Left:
-                var turnLeftAngle = position.DirectionAngle == 0 ? 270 : position.DirectionAngle - 90; 
-                position = position with {DirectionAngle = turnLeftAngle};
-                break;
-            case RobotCommand.Right:
-                var turnRightAngle = position.DirectionAngle == 270 ? 0 : position.DirectionAngle + 90; 
-                position = position with {DirectionAngle = turnRightAngle};
-                break;
-            default:
-                throw new NotImplementedException($"Command {command} is not implemented");
+            foreach (var command in commands)
+            {
+                robot.Execute(command);
+            }
+
+            _robotRepository.Update(robot);
         }
 
-        return _robotRepository.Update(robot with {Position = position});
+        return robots;
     }
 }
