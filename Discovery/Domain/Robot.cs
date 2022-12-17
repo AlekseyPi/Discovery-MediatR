@@ -28,15 +28,15 @@ public class Robot
     {
         if (!new decimal[] {0, 90, 180, 270}.Contains(directionAngle))
         {
-            throw new ValidationException($"Invalid direction angle {directionAngle}. Supported angles are: 0, 90, 180, 270.");
+            throw new Exception($"Invalid direction angle {directionAngle}. Supported angles are: 0, 90, 180, 270.");
         }
         if (areaX1 > areaX2)
         {
-            throw new ValidationException($"AreaX1 ({areaX1} must be smaller then AreaX2 {areaX2})");
+            throw new Exception($"AreaX1 ({areaX1} must be smaller then AreaX2 {areaX2})");
         }
         if (areaY1 > areaY2)
         {
-            throw new ValidationException($"AreaY1 ({areaY1} must be smaller then AreaY2 {areaY2})");
+            throw new Exception($"AreaY1 ({areaY1} must be smaller then AreaY2 {areaY2})");
         }
         
         Id = id;
