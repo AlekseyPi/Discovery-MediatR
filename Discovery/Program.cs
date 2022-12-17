@@ -51,7 +51,7 @@ app.MapGet("/robot/{id}", async (int id, IMediator mediator) =>
 app.MapPost("/robot", async (CreateRobotDto robot, IMediator mediator) => 
     Results.Ok(await mediator.Send(new CreateRobotCommand(robot))));
 
-app.MapDelete("/robot", async (int id, IMediator mediator) =>
+app.MapDelete("/robot/{id}", async (int id, IMediator mediator) =>
 {
     var deletedId = await mediator.Send(new DeleteRobotCommand(id));
     return deletedId == id ? Results.Ok() : Results.NotFound($"Robot with id {id} not found");
