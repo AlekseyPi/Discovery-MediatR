@@ -13,7 +13,7 @@ public class Robot
     public decimal AreaX2 { get; }
     public decimal AreaY2 { get; }
     
-    public bool IsInArea => X > AreaX1 && X < AreaX2 && Y > AreaY1 && Y < AreaY2;
+    public bool IsInArea => X >= AreaX1 && X <= AreaX2 && Y >= AreaY1 && Y <= AreaY2;
 
     public Robot(
         int id, 
@@ -32,11 +32,11 @@ public class Robot
         }
         if (areaX1 > areaX2)
         {
-            throw new Exception($"AreaX1 ({areaX1} must be smaller then AreaX2 {areaX2})");
+            throw new Exception($"AreaX1 ({areaX1}) must be smaller then AreaX2 ({areaX2})");
         }
         if (areaY1 > areaY2)
         {
-            throw new Exception($"AreaY1 ({areaY1} must be smaller then AreaY2 {areaY2})");
+            throw new Exception($"AreaY1 ({areaY1}) must be smaller then AreaY2 ({areaY2})");
         }
         
         Id = id;
@@ -53,8 +53,6 @@ public class Robot
     {
         return Id = id;
     }
-
-    
 
     public void Execute(Command command)
     {

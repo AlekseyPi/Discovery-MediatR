@@ -1,16 +1,19 @@
-using System;
 using System.Net.Mime;
+using System.Reflection;
+using Discovery.Commands;
 using Discovery.Domain;
+using Discovery.Dtos;
+using Discovery.Queries;
+using MediatR;
 using Microsoft.AspNetCore.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
 
 builder.Services.AddSingleton<RobotRepository>();
-builder.Services.AddScoped<RobotsService>();
 
 var app = builder.Build();
 
@@ -35,9 +38,9 @@ app.UseExceptionHandler(exceptionHandlerApp =>
     });
 });
 
-app.MapGet("/robot/{id}", (int id, RobotRepository repository) =>
+app.MapGet("/robot/{id}", async (int id, IMediator mediator) =>
 {
-    var robot = repository.Get(id);
+    var robot = await mediator.Send(new GetRobotQuery(id));
     if (robot is null)
     {
         return Results.NotFound($"Robot with id {id} not found");
@@ -45,24 +48,16 @@ app.MapGet("/robot/{id}", (int id, RobotRepository repository) =>
     return Results.Ok(robot);
 });
 
-app.MapPost("/robot", (Robot robot, RobotsService robotService) => Results.Ok(robotService.Add(robot)));
+app.MapPost("/robot", async (CreateRobotDto robot, IMediator mediator) => 
+    Results.Ok(await mediator.Send(new CreateRobotCommand(robot))));
 
-app.MapDelete("/robot", (int id, RobotRepository repository) =>
-    repository.Remove(id) == 0 ? Results.NotFound($"Robot with id {id} not found") : Results.Ok());
-
-app.MapPost("/commands/{commands}", (string commands, RobotsService robotService) =>
+app.MapDelete("/robot", async (int id, IMediator mediator) =>
 {
-    var commandsArray = commands.Split(",").Select(ParseCommand).ToArray();
-    return Results.Ok(robotService.Execute(commandsArray));
-    
-    Command ParseCommand(string s)
-    {
-        var allSupportedCommands = String.Join(", ", Enum.GetNames<Command>());
-        return Enum.TryParse(s, true, out Command command) && Enum.IsDefined(typeof(Command), command)
-            ? command
-            : throw new Exception($"Unknown command: '{s}'. Supported commands: {allSupportedCommands}");
-    }
+    var deletedId = await mediator.Send(new DeleteRobotCommand(id));
+    return deletedId == id ? Results.Ok() : Results.NotFound($"Robot with id {id} not found");
 });
 
+app.MapPost("/commands/{commands}", async (string commands, IMediator mediator) => 
+    Results.Ok(await mediator.Send(new ExecuteCommandsCommand(commands))));
 
 app.Run();
