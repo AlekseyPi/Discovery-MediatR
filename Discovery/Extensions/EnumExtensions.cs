@@ -4,6 +4,6 @@ public static class EnumExtensions
 {
     public static string ValuesAsString<TEnum>() where TEnum : struct, Enum
     {
-        return String.Join(", ", Enum.GetNames<TEnum>());
+        return string.Join(", ", Enum.GetNames<TEnum>());
     }
 }

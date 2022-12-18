@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Discovery.Handlers;
 
-public class GetRobotHandler: IRequestHandler<GetRobotQuery, RobotDto?> 
+public class GetRobotHandler : IRequestHandler<GetRobotQuery, RobotDto?>
 {
     private readonly RobotRepository _robotRepository;
 
@@ -13,7 +13,7 @@ public class GetRobotHandler: IRequestHandler<GetRobotQuery, RobotDto?>
     {
         _robotRepository = robotRepository;
     }
-    
+
     public async Task<RobotDto?> Handle(GetRobotQuery request, CancellationToken cancellationToken)
     {
         return (await _robotRepository.Get(request.Id))?.ToDto();

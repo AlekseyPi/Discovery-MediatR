@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Discovery.Queries;
 
-public record GetRobotQuery(int Id): IRequest<RobotDto?>;
+public record GetRobotQuery(int Id) : IRequest<RobotDto?>;

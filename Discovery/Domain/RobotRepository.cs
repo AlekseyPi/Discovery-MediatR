@@ -8,7 +8,7 @@ public class RobotRepository
     {
         return await Task.FromResult(Robots.FirstOrDefault(r => r.Id == id));
     }
-    
+
     public async Task<Robot[]> GetAll()
     {
         return await Task.FromResult(Robots.ToArray());
@@ -32,10 +32,7 @@ public class RobotRepository
     public async Task<int?> Remove(int id)
     {
         var robot = Robots.SingleOrDefault(r => r.Id == id);
-        if (robot is null)
-        {
-            return await Task.FromResult<int?>(null);
-        }
+        if (robot is null) return await Task.FromResult<int?>(null);
         Robots.Remove(robot);
         return await Task.FromResult(robot.Id);
     }

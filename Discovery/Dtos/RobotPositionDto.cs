@@ -6,6 +6,8 @@ public record RobotPositionDto(int Id, decimal X, decimal Y);
 
 public static partial class RobotDtoExtensions
 {
-    public static RobotPositionDto ToPositionDto(this Robot robot) => 
-        new RobotPositionDto(robot.Id, robot.X, robot.Y);
+    public static RobotPositionDto ToPositionDto(this Robot robot)
+    {
+        return new(robot.Id, robot.X, robot.Y);
+    }
 }

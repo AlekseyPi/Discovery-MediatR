@@ -3,22 +3,23 @@ using Discovery.Domain;
 namespace Discovery.Dtos;
 
 public record RobotDto(
-    int Id, 
-    decimal X, 
+    int Id,
+    decimal X,
     decimal Y,
     decimal DirectionAngle,
-    decimal AreaX1, 
-    decimal AreaY1, 
-    decimal AreaX2, 
-    decimal AreaY2, 
+    decimal AreaX1,
+    decimal AreaY1,
+    decimal AreaX2,
+    decimal AreaY2,
     bool IsInArea);
 
 public static partial class RobotDtoExtensions
 {
-    public static RobotDto ToDto(this Robot robot) => 
-        new RobotDto(
-            robot.Id, 
-            robot.X, 
+    public static RobotDto ToDto(this Robot robot)
+    {
+        return new(
+            robot.Id,
+            robot.X,
             robot.Y,
             robot.DirectionAngle,
             robot.AreaX1,
@@ -26,4 +27,5 @@ public static partial class RobotDtoExtensions
             robot.AreaX2,
             robot.AreaY2,
             robot.IsInArea);
+    }
 }
