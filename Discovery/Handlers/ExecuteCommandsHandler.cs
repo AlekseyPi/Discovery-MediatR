@@ -1,6 +1,7 @@
 using Discovery.Commands;
 using Discovery.Domain;
 using Discovery.Dtos;
+using Discovery.Extensions;
 using MediatR;
 
 namespace Discovery.Handlers;
@@ -8,7 +9,6 @@ namespace Discovery.Handlers;
 public class ExecuteCommandsHandler: IRequestHandler<ExecuteCommandsCommand, RobotsStateDto>
 {
     private readonly RobotRepository _robotRepository;
-    private readonly string _allSupportedCommands = String.Join(", ", Enum.GetNames<Command>());
 
     public ExecuteCommandsHandler(RobotRepository robotRepository)
     {
@@ -47,7 +47,7 @@ public class ExecuteCommandsHandler: IRequestHandler<ExecuteCommandsCommand, Rob
         {
             return Enum.TryParse(s, true, out Command command) && Enum.IsDefined(typeof(Command), command)
                 ? command
-                : throw new Exception($"Unknown command: '{s}'. Supported commands: {_allSupportedCommands}.");
+                : throw new Exception($"Unknown command: '{s}'. Supported commands: {EnumExtensions.ValuesAsString<Command>()}.");
         }
     }
 }

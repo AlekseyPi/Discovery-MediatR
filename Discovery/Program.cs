@@ -1,16 +1,19 @@
+using System.ComponentModel;
 using System.Net.Mime;
 using System.Reflection;
 using Discovery.Commands;
 using Discovery.Domain;
 using Discovery.Dtos;
+using Discovery.Extensions;
 using Discovery.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Diagnostics;
+using Swashbuckle.AspNetCore.Annotations;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c => c.EnableAnnotations());
 builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
 
 builder.Services.AddSingleton<RobotRepository>();
@@ -38,7 +41,15 @@ app.UseExceptionHandler(exceptionHandlerApp =>
     });
 });
 
-app.MapGet("/robot/{id}", async (int id, IMediator mediator) =>
+
+app.MapGet("/robot/{id}", 
+    [SwaggerOperation(
+        Summary = "Returns single robot",
+        Description = "Returns full information about single robot")
+    ]
+    [SwaggerResponse(StatusCodes.Status200OK, type: typeof(RobotDto))]
+    [SwaggerResponse(StatusCodes.Status404NotFound)]
+    async (int id, IMediator mediator) =>
 {
     var robot = await mediator.Send(new GetRobotQuery(id));
     if (robot is null)
@@ -48,16 +59,38 @@ app.MapGet("/robot/{id}", async (int id, IMediator mediator) =>
     return Results.Ok(robot);
 });
 
-app.MapPost("/robot", async (CreateRobotDto robot, IMediator mediator) => 
+app.MapPost("/robot", 
+    [SwaggerOperation(
+        Summary = "Creates single robot",
+        Description = "Returns full information about created robot")
+    ]
+    [SwaggerResponse(StatusCodes.Status200OK, type: typeof(RobotDto))]
+    [SwaggerResponse(StatusCodes.Status400BadRequest, "AreaX1/Y1 must be smaller then AreaX2/Y2")]
+    async (CreateRobotDto robot, IMediator mediator) => 
     Results.Ok(await mediator.Send(new CreateRobotCommand(robot))));
 
-app.MapDelete("/robot/{id}", async (int id, IMediator mediator) =>
+app.MapDelete("/robot/{id}", 
+    [SwaggerOperation(
+        Summary = "Deletes single robot")
+    ]
+    [SwaggerResponse(StatusCodes.Status200OK)]
+    [SwaggerResponse(StatusCodes.Status404NotFound)]
+    async (int id, IMediator mediator) =>
 {
     var deletedId = await mediator.Send(new DeleteRobotCommand(id));
     return deletedId == id ? Results.Ok() : Results.NotFound($"Robot with id {id} not found");
 });
 
-app.MapPost("/commands/{commands}", async (string commands, IMediator mediator) => 
+app.MapPost("/commands/{commands}", 
+    [SwaggerOperation(
+        Summary = "Sends list of commands to all robots",
+        Description = "Every robot in simulation executes list of provided commands")
+    ]
+    [SwaggerResponse(StatusCodes.Status200OK, type: typeof(RobotsStateDto))]
+    [SwaggerResponse(StatusCodes.Status400BadRequest, "Commands string should contain valid comma separated values")]
+    [SwaggerResponse(StatusCodes.Status404NotFound)]
+    async ([SwaggerParameter($"Comma separated list of values: {nameof(Command.Advance)}, {nameof(Command.Left)}, {nameof(Command.Right)}")] 
+            string commands, IMediator mediator) => 
     Results.Ok(await mediator.Send(new ExecuteCommandsCommand(commands))));
 
 app.Run();
